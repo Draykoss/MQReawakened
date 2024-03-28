@@ -20,12 +20,12 @@ public class BattleAttack : ExternalProtocol
             Player.SendXt("Bm", pet, target);
 
         else
-            DecipherAbilityType(attack, pet, target, model);
+            SendAbilityType(attack, pet, target, model);
 
         Player.SendXt("BT", pet >= 3 ? "1" : "0");
     }
 
-    private void DecipherAbilityType(int attack, int pet, int target, PetBattleModel model)
+    private void SendAbilityType(int attack, int pet, int target, PetBattleModel model)
     {
         var battlePet = model.Pets[pet];
         var ability = battlePet.abilities.FirstOrDefault(x => x.index == attack);
