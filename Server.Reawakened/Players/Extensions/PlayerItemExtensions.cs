@@ -19,7 +19,7 @@ public static class PlayerItemExtensions
         Microsoft.Extensions.Logging.ILogger logger, ItemDescription usedItem, Vector3 position, int direction)
     {
         var isLeft = direction > 0;
-        var dropDirection = isLeft ? 1 : -1;
+        var dropDirection = isLeft ? config.DropXOffset : -config.DropXOffset;
         var platform = new GameObjectModel();
         var planeName = player.GetPlayersPlaneString();
 
@@ -34,12 +34,12 @@ public static class PlayerItemExtensions
             TimerThread = timerThread
         };
 
-        timerThread.DelayCall(DropItem, dropItemData, TimeSpan.FromMilliseconds(1000), TimeSpan.Zero, 1);
+        timerThread.DelayCall(DropItem, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1, dropItemData);
     }
 
     private class DroppedItemData()
     {
-        public int DropDirection { get; set; }
+        public float DropDirection { get; set; }
         public ItemDescription UsedItem { get; set; }
         public Vector3 Position { get; set; }
         public Player Player { get; set; }
@@ -68,14 +68,14 @@ public static class PlayerItemExtensions
         var bombData = new BombData()
         {
             Position = player.TempData.CopyPosition(),
-            Radius = 5.4f,
+            Radius = dropData.ItemRConfig.DropRadius,
             Thread = dropData.TimerThread,
             Damage = dropData.UsedItem.GetDamageAmount(dropData.Logger, dropData.ItemRConfig),
             DamageType = dropData.UsedItem.Elemental,
             Player = player,
         };
 
-        dropData.TimerThread.DelayCall(ExplodeBomb, bombData, TimeSpan.FromMilliseconds(2850), TimeSpan.Zero, 1);
+        dropData.TimerThread.DelayCall(ExplodeBomb, TimeSpan.FromSeconds(dropData.ItemRConfig.DropDelay), TimeSpan.Zero, 1, bombData);
     }
 
     private class BombData()
