@@ -33,7 +33,7 @@ public static class PlayerDamageExtensions
 
         player.TempData.Underwater = true;
         player.TempData.UnderwaterTimer = timerThread.RunInterval(ApplyUnderwaterDamage, underwaterData,
-            TimeSpan.FromSeconds(serverRConfig.UnderwaterDamageInterval), ticksTillDeath, TimeSpan.FromSeconds(serverRConfig.BreathTimerDuration));
+            TimeSpan.FromSeconds(serverRConfig.BreathTimerDuration), TimeSpan.FromSeconds(serverRConfig.UnderwaterDamageInterval), ticksTillDeath);
     }
 
     public static void ApplyUnderwaterDamage(ITimerData data)

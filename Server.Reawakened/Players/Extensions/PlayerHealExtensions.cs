@@ -66,7 +66,7 @@ public static class PlayerHealExtensions
         {
             var healItemData = new ItemHealOverTimeData() { OverTimeHealValue = effect.Value, TotalTicks = effect.Duration / 3, Player = player };
 
-            timerThread.RunInterval(OverTimeHealTicks, healItemData, TimeSpan.FromSeconds(3), healItemData.TotalTicks, TimeSpan.FromSeconds(3));
+            timerThread.RunInterval(OverTimeHealTicks, healItemData, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3), healItemData.TotalTicks);
         }
     }
 

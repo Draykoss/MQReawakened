@@ -30,7 +30,7 @@ public class NetStateHandler(FileLogger fileLogger,
     public void Initialize() =>
         sink.ServerStarted += _ =>
             services.GetRequiredService<TimerThread>()
-            .RunIndefiniteDelayedInterval(CheckAllAlive, this, TimeSpan.FromMinutes(1.5), TimeSpan.FromMinutes(1.0));
+            .RunIndefiniteDelayedInterval(CheckAllAlive, this, TimeSpan.FromMinutes(1.0), TimeSpan.FromMinutes(1.5));
 
     public NetState FindUser(int userId) =>
         (

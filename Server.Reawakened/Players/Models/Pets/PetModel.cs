@@ -71,7 +71,7 @@ public class PetModel()
 
         player.TempData.PetEnergyRegenTimer = energyRegenerationTimer.RunInterval(
             RegenerateEnergy, new PetTimer() { Pet = this, Player = player },
-            TimeSpan.FromMinutes((double)interval), MaxEnergy - CurrentEnergy, TimeSpan.FromMinutes((double)interval)
+            TimeSpan.FromMinutes((double)interval), TimeSpan.FromMinutes((double)interval), MaxEnergy - CurrentEnergy
         );
     }
 

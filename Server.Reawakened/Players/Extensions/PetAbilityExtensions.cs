@@ -46,8 +46,8 @@ public static class PetAbilityExtensions
 
         //Sends method of ability type after a short delay.
         timerThread.RunInterval(pet.GetAbilityType(), new PlayerTimer() { Player = petOwner },
-            TimeSpan.FromSeconds(pet.AbilityParams.Frequency), pet.AbilityParams.HitCount,
-            TimeSpan.FromSeconds(pet.AbilityParams.InitialDelayBeforeUse)
+            TimeSpan.FromSeconds(pet.AbilityParams.InitialDelayBeforeUse), TimeSpan.FromSeconds(pet.AbilityParams.Frequency),
+            pet.AbilityParams.HitCount
         );
     }
 
