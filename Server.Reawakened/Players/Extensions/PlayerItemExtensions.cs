@@ -1,5 +1,6 @@
 ﻿using A2m.Server;
 using Microsoft.Extensions.Logging;
+using Server.Base.Core.Abstractions;
 using Server.Base.Timers.Extensions;
 using Server.Base.Timers.Services;
 using Server.Reawakened.Core.Configs;
@@ -9,6 +10,8 @@ using Server.Reawakened.Players.Helpers;
 using Server.Reawakened.Rooms;
 using Server.Reawakened.Rooms.Extensions;
 using Server.Reawakened.Rooms.Models.Planes;
+using Server.Reawakened.Rooms.Models.Timers;
+using Smolv;
 using UnityEngine;
 using Random = System.Random;
 
@@ -19,7 +22,7 @@ public static class PlayerItemExtensions
         Microsoft.Extensions.Logging.ILogger logger, ItemDescription usedItem, Vector3 position, int direction)
     {
         var isLeft = direction > 0;
-        var dropDirection = isLeft ? config.DropXOffset : -config.DropXOffset;
+        var dropDirection = isLeft ? 1 : -1;
         var platform = new GameObjectModel();
         var planeName = player.GetPlayersPlaneString();
 
@@ -34,59 +37,61 @@ public static class PlayerItemExtensions
             TimerThread = timerThread
         };
 
-        timerThread.DelayCall(DropItem, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1, dropItemData);
+        timerThread.RunDelayed(DropItem, dropItemData, TimeSpan.FromMilliseconds(1000));
     }
 
-    private class DroppedItemData()
+    private class DroppedItemData : PlayerRoomTimer
     {
-        public float DropDirection { get; set; }
+        public int DropDirection { get; set; }
         public ItemDescription UsedItem { get; set; }
         public Vector3 Position { get; set; }
-        public Player Player { get; set; }
         public Microsoft.Extensions.Logging.ILogger Logger { get; set; }
         public ItemRConfig ItemRConfig { get; set; }
         public TimerThread TimerThread { get; set; }
     }
 
-    private static void DropItem(object data)
+    private static void DropItem(ITimerData data)
     {
-        var dropData = (DroppedItemData)data;
-        var player = dropData.Player;
-
-        if (player == null)
+        if (data is not DroppedItemData drop)
             return;
 
-        if (player.Character == null || player.Room == null || player.TempData == null)
-            return;
+        var player = drop.Player;
 
         var dropItem = new LaunchItem_SyncEvent(player.GameObjectId.ToString(), player.Room.Time,
-            player.TempData.Position.x + dropData.DropDirection, player.TempData.Position.y, player.TempData.Position.z,
-            0, 0, 3, 0, dropData.UsedItem.PrefabName);
+            player.TempData.Position.x + drop.DropDirection, player.TempData.Position.y, player.TempData.Position.z,
+            0, 0, 3, 0, drop.UsedItem.PrefabName);
 
         player.Room.SendSyncEvent(dropItem);
 
         var bombData = new BombData()
         {
             Position = player.TempData.CopyPosition(),
-            Radius = dropData.ItemRConfig.DropRadius,
-            Thread = dropData.TimerThread,
-            Damage = dropData.UsedItem.GetDamageAmount(dropData.Logger, dropData.ItemRConfig),
-            DamageType = dropData.UsedItem.Elemental,
+            Radius = 5.4f,
+            Thread = drop.TimerThread,
+            Damage = drop.UsedItem.GetDamageAmount(drop.Logger, drop.ItemRConfig),
+            DamageType = drop.UsedItem.Elemental,
             Player = player,
         };
 
-        dropData.TimerThread.DelayCall(ExplodeBomb, TimeSpan.FromSeconds(dropData.ItemRConfig.DropDelay), TimeSpan.Zero, 1, bombData);
+        drop.TimerThread.RunDelayed(ExplodeBomb, bombData, TimeSpan.FromMilliseconds(2850));
     }
 
-    private class BombData()
+    private class BombData : PlayerRoomTimer
     {
-        public Player Player { get; set; }
         public Vector3 Position { get; set; }
         public float Radius { get; set; }
         public int Damage { get; set; }
         public Elemental DamageType { get; set; }
         public TimerThread Thread { get; set; }
         public ServerRConfig ServerRConfig { get; set; }
+    }
+
+    private static void ExplodeBomb(ITimerData data)
+    {
+        if (data is not BombData bomb)
+            return;
+
+        ExplodeBomb(bomb.Player.Room, bomb.Player, bomb.Position, bomb.Radius, bomb.Damage, bomb.DamageType, bomb.ServerRConfig, bomb.Thread);
     }
 
     public static void ExplodeBomb(this Room room, Player player, Vector3 position,
@@ -102,16 +107,6 @@ public static class PlayerItemExtensions
                 nearPlayer.ApplyCharacterDamage(damage, nearPlayer.GameObjectId, 1, serverRConfig, thread);
 
         room.Logger.LogInformation("Running bomb at coords: {Position} of radius {Radius}", position, radius);
-    }
-
-    private static void ExplodeBomb(object data)
-    {
-        var bData = (BombData)data;
-
-        if (bData.Player == null)
-            return;
-
-        ExplodeBomb(bData.Player.Room, bData.Player, bData.Position, bData.Radius, bData.Damage, bData.DamageType, bData.ServerRConfig, bData.Thread);
     }
 
     public static int GetDamageAmount(this ItemDescription usedItem, Microsoft.Extensions.Logging.ILogger logger, ItemRConfig config)
