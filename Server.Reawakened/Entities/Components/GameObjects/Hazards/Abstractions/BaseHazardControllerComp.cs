@@ -41,7 +41,6 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
     private string _id;
 
     public TimerThread TimerThread { get; set; }
-    public ItemRConfig ItemRConfig { get; set; }
     public ServerRConfig ServerRConfig { get; set; }
     public WorldStatistics WorldStatistics { get; set; }
     public ItemCatalog ItemCatalog { get; set; }
