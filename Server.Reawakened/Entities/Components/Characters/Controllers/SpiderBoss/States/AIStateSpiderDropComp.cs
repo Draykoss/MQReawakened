@@ -21,7 +21,7 @@ public class AIStateSpiderDropComp : BaseAIState<AIStateSpiderDrop>
     {
         Position.SetPosition(Position.X, FloorY, Position.Z);
 
-        TimerThread.DelayCall(RunIdleState, null, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(RunIdleState, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
     }
 
     public override ExtLevelEditor.ComponentSettings GetSettings() =>

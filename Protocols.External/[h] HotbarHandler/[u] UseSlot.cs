@@ -157,7 +157,7 @@ public class UseSlot : ExternalProtocol
 
         if (isGrenade)
         {
-            TimerThread.DelayCall(LaunchProjectile, projectileData, TimeSpan.FromSeconds(ItemRConfig.GrenadeSpawnDelay), TimeSpan.Zero, 1);
+            TimerThread.DelayCall(LaunchProjectile, TimeSpan.FromSeconds(ItemRConfig.GrenadeSpawnDelay), TimeSpan.Zero, 1, projectileData);
             Player.UseItemFromHotBar(usedItem.ItemId, ItemCatalog, ItemRConfig);
         }
         else

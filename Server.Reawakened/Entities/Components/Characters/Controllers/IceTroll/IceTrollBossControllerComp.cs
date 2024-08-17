@@ -39,7 +39,7 @@ public class IceTrollBossControllerComp : BaseAIStateMachine<IceTrollBossControl
             var delay = Room.GetEntityFromId<AIStateTrollEntranceComp>(Id)?.DelayBeforeEntranceDuration;
 
             if (delay.HasValue)
-                TimerThread.DelayCall(RunEntrance, null, TimeSpan.FromSeconds(delay.Value), TimeSpan.Zero, 1);
+                TimerThread.DelayCall(RunEntrance, TimeSpan.FromSeconds(delay.Value), TimeSpan.Zero, 1);
         }
     }
 

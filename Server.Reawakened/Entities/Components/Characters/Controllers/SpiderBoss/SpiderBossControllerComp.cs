@@ -55,7 +55,7 @@ public class SpiderBossControllerComp : BaseAIStateMachine<SpiderBossController>
                 Room.GetEntityFromId<AIStateSpiderEntranceComp>(Id)?.DelayBeforeEntranceDuration;
 
             if (delay.HasValue)
-                TimerThread.DelayCall(RunEntrance, null, TimeSpan.FromSeconds(delay.Value), TimeSpan.Zero, 1);
+                TimerThread.DelayCall(RunEntrance, TimeSpan.FromSeconds(delay.Value), TimeSpan.Zero, 1);
         }
     }
 

@@ -78,8 +78,8 @@ public class PetModel()
         var interval = timeToRegainEnergy / MaxEnergy;
 
         player.TempData.PetEnergyRegenTimer?.Stop();
-        player.TempData.PetEnergyRegenTimer = energyRegenerationTimer.DelayCall(RegenerateEnergy, player,
-            TimeSpan.FromMinutes((double)interval), TimeSpan.FromMinutes((double)interval), MaxEnergy - CurrentEnergy);
+        player.TempData.PetEnergyRegenTimer = energyRegenerationTimer.DelayCall(RegenerateEnergy,
+            TimeSpan.FromMinutes((double)interval), TimeSpan.FromMinutes((double)interval), MaxEnergy - CurrentEnergy, player);
     }
 
     private void RegenerateEnergy(object player)
@@ -243,10 +243,10 @@ public class PetModel()
     };
 
     public void AddTriggerInteraction(Player player, TimerThread timerThread, float delay) =>
-       timerThread.DelayCall(AddTriggerInteraction, GetInteractionData(player), TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1);
+       timerThread.DelayCall(AddTriggerInteraction, TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1, GetInteractionData(player));
 
     public void RemoveTriggerInteraction(Player player, TimerThread timerThread, float delay) =>
-        timerThread.DelayCall(RemoveTriggerInteraction, GetInteractionData(player), TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1);
+        timerThread.DelayCall(RemoveTriggerInteraction, TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1, GetInteractionData(player));
 
     private void AddTriggerInteraction(object interactionData)
     {

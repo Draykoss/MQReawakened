@@ -55,7 +55,7 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
         if (ActiveDuration > 0 && DeactivationDuration > 0)
         {
             TimedHazard = true;
-            TimerThread.DelayCall(ActivateHazard, null, TimeSpan.Zero, TimeSpan.Zero, 1);
+            TimerThread.DelayCall(ActivateHazard, TimeSpan.Zero, TimeSpan.Zero, 1);
         }
 
         if (!Enum.TryParse(HurtEffect, true, out EffectType))
@@ -105,13 +105,13 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
     public void ActivateHazard(object _)
     {
         IsActive = true;
-        TimerThread.DelayCall(DeactivateHazard, null, TimeSpan.FromSeconds(ActiveDuration), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(DeactivateHazard, TimeSpan.FromSeconds(ActiveDuration), TimeSpan.Zero, 1);
     }
 
     public void DeactivateHazard(object _)
     {
         IsActive = false;
-        TimerThread.DelayCall(ActivateHazard, null, TimeSpan.FromSeconds(DeactivationDuration), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(ActivateHazard, TimeSpan.FromSeconds(DeactivationDuration), TimeSpan.Zero, 1);
     }
 
     //Standard Hazards
@@ -176,8 +176,7 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
                 player.ApplyCharacterDamage(Damage, _id, DamageDelay, ServerRConfig, TimerThread);
                 break;
             case ItemEffectType.PoisonDamage:
-                TimerThread.DelayCall(ApplyPoisonEffect, player,
-                    TimeSpan.FromSeconds(InitialDamageDelay), TimeSpan.FromSeconds(DamageDelay), 1);
+                TimerThread.DelayCall(ApplyPoisonEffect, TimeSpan.FromSeconds(InitialDamageDelay), TimeSpan.FromSeconds(DamageDelay), 1, player);
                 break;
             case ItemEffectType.WaterBreathing:
                 ApplyWaterBreathing(player);
@@ -206,7 +205,7 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
 
         IsActive = false;
 
-        TimerThread.DelayCall(RestartTimerDelay, null, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(RestartTimerDelay, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
         Logger.LogInformation("Reset underwater timer for {characterName}", player.CharacterName);
     }
 
@@ -240,7 +239,7 @@ public abstract class BaseHazardControllerComp<T> : Component<T> where T : Hazar
         // Reduces slow status effect log spam.  
         player.TempData.IsSlowed = true;
         
-        TimerThread.DelayCall(DisableSlowEffect, player, TimeSpan.FromSeconds(0.75), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(DisableSlowEffect, TimeSpan.FromSeconds(0.75), TimeSpan.Zero, 1, player);
     }
 
     private void DisableSlowEffect(object player)

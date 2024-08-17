@@ -17,7 +17,7 @@ public class AIStateSpiderTeaserEntranceComp : BaseAIState<AIStateSpiderTeaserEn
     public TimerThread TimerThread { get; set; }
 
     public override void StartState() =>
-        TimerThread.DelayCall(RunExitEntrance, null, TimeSpan.FromSeconds(IntroDuration), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(RunExitEntrance, TimeSpan.FromSeconds(IntroDuration), TimeSpan.Zero, 1);
 
     private void RunExitEntrance(object _)
     {

@@ -43,8 +43,8 @@ public static class PetAbilityExtensions
         pet.StartEnergyRegeneration(petOwner, timerThread, worldStatistics);
 
         //Sends method of ability type after a short delay.
-        timerThread.DelayCall(pet.GetAbilityType(), petOwner, TimeSpan.FromSeconds(pet.AbilityParams.InitialDelayBeforeUse),
-            TimeSpan.FromSeconds(pet.AbilityParams.Frequency), pet.AbilityParams.HitCount);
+        timerThread.DelayCall(pet.GetAbilityType(), TimeSpan.FromSeconds(pet.AbilityParams.InitialDelayBeforeUse),
+            TimeSpan.FromSeconds(pet.AbilityParams.Frequency), pet.AbilityParams.HitCount, petOwner);
     }
 
     private static TimerCallback GetAbilityType(this PetModel pet) =>

@@ -26,7 +26,7 @@ public class DroppingsControllerComp : Component<DroppingsController>
     }
 
     public void WaitDrop() =>
-        TimerThread.DelayCall(SendDrop, null, TimeSpan.FromSeconds(DropRate), TimeSpan.FromSeconds(1), 1);
+        TimerThread.DelayCall(SendDrop, TimeSpan.FromSeconds(DropRate), TimeSpan.FromSeconds(1), 1);
 
     public void SendDrop(object _)
     {

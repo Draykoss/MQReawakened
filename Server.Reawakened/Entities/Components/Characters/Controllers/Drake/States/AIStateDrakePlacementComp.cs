@@ -20,7 +20,7 @@ public class AIStateDrakePlacementComp : BaseAIState<AIStateDrakePlacement>
     public TimerThread TimerThread { get; set; }
 
     public override void StartState() =>
-        TimerThread.DelayCall(RunPatrolState, null, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(RunPatrolState, TimeSpan.FromSeconds(1), TimeSpan.Zero, 1);
 
     // Provide Initial And Placement Positions
     public override ExtLevelEditor.ComponentSettings GetSettings()

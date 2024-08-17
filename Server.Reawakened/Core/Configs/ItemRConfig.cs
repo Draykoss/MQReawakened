@@ -4,20 +4,28 @@ using Server.Reawakened.Players.Models.Character;
 namespace Server.Reawakened.Core.Configs;
 public class ItemRConfig : IRConfig
 {
+    public int[] SingleItemKit { get; }
+    public int[] StackedItemKit { get; }
+    public int HealAmount { get; }
+    public int AmountToStack { get; }
+
+    public int MysticCharmID { get; }
+    public int HealingStaffID { get; }
     public int HealingStaff { get; }
     public double HealingStaffHealValue { get; }
-    public int HealAmount { get; }
 
     public int DefaultMeleeDamage { get; }
     public int DefaultRangedDamage { get; }
     public int DefaultDropDamage { get; }
+    public float DropDelay { get; }
+    public float DropRadius { get; }
+    public float DropXOffset { get; }
 
-    public int[] SingleItemKit { get; }
-    public int[] StackedItemKit { get; }
-    public int AmountToStack { get; }
-
-    public int HealingStaffID { get; }
-    public int MysticCharmID { get; }
+    public float GrenadeSpeedX { get; }
+    public float GrenadeSpeedY { get; }
+    public float GrenadeGravityFactor { get; }
+    public float GrenadeSpawnDelay { get; }
+    public float GrenadeLifeTime { get; }
 
     public float ProjectileSpeedX { get; }
     public float ProjectileSpeedY { get; }
@@ -26,12 +34,6 @@ public class ItemRConfig : IRConfig
     public float ProjectileYOffset { get; }
     public float ProjectileWidth { get; }
     public float ProjectileHeight { get; }
-
-    public float GrenadeSpeedX { get; }
-    public float GrenadeSpeedY { get; }
-    public float GrenadeGravityFactor { get; }
-    public float GrenadeSpawnDelay { get; }
-    public float GrenadeLifeTime { get; }
 
     public float MeleeWidth { get; }
     public float MeleeHeight { get; }
@@ -52,7 +54,7 @@ public class ItemRConfig : IRConfig
         [
             394,  // glider
             395,  // grappling hook
-            9701,  // snowboard
+            9701, // snowboard
             397,  // wooden slingshot
             423,  // golden slingshot
             453,  // kernel blaster
@@ -71,7 +73,7 @@ public class ItemRConfig : IRConfig
             2973, // crimson dragon pack
             2923, // banana box
             3024, // steel sword
-            2878 // cadet training sword
+            2878  // cadet training sword
         ];
 
         StackedItemKit =
@@ -85,14 +87,17 @@ public class ItemRConfig : IRConfig
         AmountToStack = 99;
         HealAmount = 100000;
 
+        MysticCharmID = 398;
+        HealingStaffID = 396;
         HealingStaff = 396;
         HealingStaffHealValue = 3.527f;
+
         DefaultMeleeDamage = 22;
         DefaultRangedDamage = 18;
         DefaultDropDamage = 35;
-
-        HealingStaffID = 396;
-        MysticCharmID = 398;
+        DropDelay = 3f;
+        DropRadius = 5.4f;
+        DropXOffset = 0.7f;
 
         GrenadeSpeedX = 7f;
         GrenadeSpeedY = 7f;

@@ -13,7 +13,7 @@ public abstract class BaseAIRetreatState<T> : BaseAIState<T>
     public override void StartState()
     {
         if (DoorId > 0)
-            TimerThread.DelayCall(OpenDoor, null, TimeSpan.FromSeconds(DelayUntilOpen), TimeSpan.Zero, 1);
+            TimerThread.DelayCall(OpenDoor, TimeSpan.FromSeconds(DelayUntilOpen), TimeSpan.Zero, 1);
     }
 
     public void OpenDoor(object _)

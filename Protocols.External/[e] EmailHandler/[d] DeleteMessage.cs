@@ -32,7 +32,7 @@ public class DeleteMessage : ExternalProtocol
                 ItemCatalog = ItemCatalog
             };
 
-            TimerThread.DelayCall(RunGiftAnimation, giftData, TimeSpan.FromMilliseconds(3300), TimeSpan.Zero, 1);
+            TimerThread.DelayCall(RunGiftAnimation, TimeSpan.FromMilliseconds(3300), TimeSpan.Zero, 1, giftData);
         }
     }
 

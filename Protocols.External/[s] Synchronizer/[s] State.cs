@@ -212,7 +212,7 @@ public class State : ExternalProtocol
             Player.SendSyncEventToPlayer(new PhysicTeleport_SyncEvent(Player.GameObjectId.ToString(), Player.Room.Time,
             respawnPosition.Position.X, respawnPosition.Position.Y, respawnPosition.IsOnBackPlane(Logger)));
 
-        TimerThread.DelayCall(DisableInvincibility, Player, TimeSpan.FromSeconds(1.5), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(DisableInvincibility, TimeSpan.FromSeconds(1.5), TimeSpan.Zero, 1, Player);
     }
 
     private static void DisableInvincibility(object playerObj)

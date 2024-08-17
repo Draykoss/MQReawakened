@@ -31,10 +31,10 @@ public class AIStateSpiderVenomComp : BaseAIState<AIStateSpiderVenom>
 
     public override void StartState()
     {
-        TimerThread.DelayCall(LaunchProjectile, true, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossFirstProjectileDelay), TimeSpan.Zero, 1);
-        TimerThread.DelayCall(LaunchProjectile, false, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossSecondProjectileDelay), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(LaunchProjectile, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossFirstProjectileDelay), TimeSpan.Zero, 1, true);
+        TimerThread.DelayCall(LaunchProjectile, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossSecondProjectileDelay), TimeSpan.Zero, 1, false);
 
-        TimerThread.DelayCall(RunDropState, null, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossDropDelay), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(RunDropState, TimeSpan.FromSeconds(EnemyRConfig.SpiderTeaserBossDropDelay), TimeSpan.Zero, 1);
     }
 
     public void LaunchProjectile(object isFirstProjectile)

@@ -58,7 +58,7 @@ public static class PlayerStatusEffectExtensions
             IsInvincible = false
         };
 
-        timerThread.DelayCall(DisableInvincibility, invincibleData, TimeSpan.FromSeconds(durationInSeconds), TimeSpan.Zero, 1);
+        timerThread.DelayCall(DisableInvincibility, TimeSpan.FromSeconds(durationInSeconds), TimeSpan.Zero, 1, invincibleData);
     }
 
     public static void DisableInvincibility(object data)

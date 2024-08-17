@@ -269,7 +269,7 @@ public class BaseSpawnerControllerComp : Component<BaseSpawnerController>
 
         Room.SendSyncEvent(new Spawn_SyncEvent(Id, Room.Time, _spawnedEntityCount));
 
-        TimerThread.DelayCall(DelayedSpawnData, templateToSpawnAt, TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1);
+        TimerThread.DelayCall(DelayedSpawnData, TimeSpan.FromSeconds(delay), TimeSpan.Zero, 1, templateToSpawnAt);
     }
 
     private void DelayedSpawnData(object obj)

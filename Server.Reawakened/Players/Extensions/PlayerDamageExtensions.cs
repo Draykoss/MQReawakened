@@ -31,8 +31,9 @@ public static class PlayerDamageExtensions
         var ticksTillDeath = (int)Math.Ceiling((double)player.Character.CurrentLife / damage);
 
         player.TempData.Underwater = true;
-        player.TempData.UnderwaterTimer = timerThread.DelayCall(ApplyUnderwaterDamage, underwaterData,
-            TimeSpan.FromSeconds(serverRConfig.BreathTimerDuration), TimeSpan.FromSeconds(serverRConfig.UnderwaterDamageInterval), ticksTillDeath);
+        player.TempData.UnderwaterTimer = timerThread.DelayCall(ApplyUnderwaterDamage,
+            TimeSpan.FromSeconds(serverRConfig.BreathTimerDuration), TimeSpan.FromSeconds(serverRConfig.UnderwaterDamageInterval),
+            ticksTillDeath, underwaterData);
     }
 
     public static void StopUnderwater(this Player player)
@@ -58,7 +59,8 @@ public static class PlayerDamageExtensions
             string.Empty, 1, waterData.ServerRConfig, waterData.TimerThread);
     }
 
-    public static void ApplyCharacterDamage(this Player player, float damage, string originId, double invincibilityDuration, ServerRConfig serverRConfig, TimerThread timerThread)
+    public static void ApplyCharacterDamage(this Player player, float damage, string originId,
+        double invincibilityDuration, ServerRConfig serverRConfig, TimerThread timerThread)
     {
         if (player.TempData.Invincible) return;
 
@@ -94,7 +96,8 @@ public static class PlayerDamageExtensions
         player.TemporaryInvincibility(timerThread, serverRConfig, invincibilityDuration);
     }
 
-    public static void ApplyDamageByPercent(this Player player, double percentage, string hazardId, float duration, ServerRConfig serverRConfig, TimerThread timerThread)
+    public static void ApplyDamageByPercent(this Player player, double percentage, string hazardId,
+        float duration, ServerRConfig serverRConfig, TimerThread timerThread)
     {
         var health = (double)player.Character.MaxLife;
 
