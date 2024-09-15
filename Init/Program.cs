@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Server.Base.Core.Events;
 using Server.Base.Core.Extensions;
 using Server.Base.Logging;
 using Server.Web.Abstractions;
@@ -11,7 +13,7 @@ using Module = Server.Base.Core.Abstractions.Module;
 
 namespace Init;
 
-public class Initialize
+public class Program
 {
     public static async Task Main()
     {
@@ -39,7 +41,12 @@ public class Initialize
 
             logger.LogInformation("======== Running Application =======");
 
-            await app.RunAsync();
+            await app.StartAsync();
+
+            var eventSink = app.Services.GetRequiredService<EventSink>();
+            eventSink.InvokeServerHosted();
+
+            await app.WaitForShutdownAsync();
         }
 
         catch (Exception ex)

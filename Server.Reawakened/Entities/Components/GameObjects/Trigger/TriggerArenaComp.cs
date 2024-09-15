@@ -13,8 +13,6 @@ public class TriggerArenaComp : BaseTriggerStatueComp<TriggerArena>
 {
     private float _timer;
     private float _minClearTime;
-    private bool _hasStarted;
-    private bool _cleared;
     private List<BaseSpawnerControllerComp> _spawners;
 
     public List<string> ArenaEntities;
@@ -25,8 +23,6 @@ public class TriggerArenaComp : BaseTriggerStatueComp<TriggerArena>
 
         ArenaEntities = [];
         _spawners = [];
-        _hasStarted = false;
-        _cleared = false;
     }
 
     public override void DelayedComponentInitialization()
@@ -40,104 +36,57 @@ public class TriggerArenaComp : BaseTriggerStatueComp<TriggerArena>
                 }
     }
 
-    public override void SendDelayedData(Player player)
+    public override ArenaStatus GetArenaStatus()
     {
-        var trigger = new Trigger_SyncEvent(Id.ToString(), Room.Time, false, "now", false);
-        if (_cleared)
-            new Trigger_SyncEvent(Id.ToString(), Room.Time, true, "now", false);
-        else if (!_cleared && _hasStarted)
-            new Trigger_SyncEvent(Id.ToString(), Room.Time, true, "now", true);
-
-        player.SendSyncEventToPlayer(trigger);
-    }
-
-    public override object[] GetInitData(Player player) => [-1];
-
-    public override void Update()
-    {
-        if (_hasStarted)
+        var outStatus = Status == ArenaStatus.Complete ? ArenaStatus.Complete : ArenaStatus.Incomplete;
+        if (HasStarted)
         {
             if (ArenaEntities.All(Room.IsObjectKilled) && Room.Time >= _minClearTime)
-                ArenaSuccess();
+                outStatus = ArenaStatus.Win;
             else if (Room.Time >= _timer)
-                ArenaFailure();
+                outStatus = ArenaStatus.Lose;
         }
+        return outStatus;
     }
 
-    public override void Triggered(Player origin, bool isSuccess, bool isActive)
+    public override void StartArena()
     {
-        if (IsActive)
+        foreach (var entity in Triggers.Where(x => x.Value == TriggerType.Activate).Select(x => x.Key))
         {
-            foreach (var entity in Triggers.Where(x => x.Value == TriggerType.Activate).Select(x => x.Key))
+            if (int.Parse(entity) <= 0)
+                continue;
+
+            foreach (var spawner in Room.GetEntitiesFromId<BaseSpawnerControllerComp>(entity))
             {
-                if (int.Parse(entity) <= 0)
-                    continue;
+                if (spawner.SpawnCycleCount > 1)
+                    ArenaEntities.Add(entity.ToString());
 
-                foreach (var spawner in Room.GetEntitiesFromId<BaseSpawnerControllerComp>(entity))
-                {
-                    if (spawner.SpawnCycleCount > 1)
-                        ArenaEntities.Add(entity.ToString());
-
-                    spawner.Spawn(this);
-                    _spawners.Add(spawner);
-                }
+                spawner.Spawn(this);
+                _spawners.Add(spawner);
             }
-
-            _timer = Room.Time + ActiveDuration;
-
-            //Failsafe to prevent respawn issues when arena is defeated too quickly
-            _minClearTime = Room.Time + 5;
-
-            var players = Room.GetPlayers();
-            foreach (var player in players)
-                player.TempData.CurrentArena = this;
-        }
-        else
-        {
-            var players = Room.GetPlayers();
-
-            //Trigger rewarded entities on win and shut down Arena
-            if (ArenaEntities.All(Room.IsObjectKilled) && Room.Time >= _minClearTime)
-            {
-                foreach (var entity in TriggeredRewards)
-                    foreach (var trigger in Room.GetEntitiesFromId<TriggerReceiverComp>(entity.ToString()))
-                        trigger.Trigger(true, origin.GameObjectId);
-
-                foreach (var player in players)
-                {
-                    player.CheckObjective(ObjectiveEnum.Score, Id, PrefabName, 1, QuestCatalog);
-                    player.Character.Write.SpawnPointId = Id;
-                }
-            }
-            else
-                foreach (var player in players)
-                    RemovePhysicalInteractor(player, player.GameObjectId);
         }
 
-        _hasStarted = isActive;
+        _timer = Room.Time + ActiveDuration;
+
+        //Failsafe to prevent respawn issues when arena is defeated too quickly
+        _minClearTime = Room.Time + 5;
     }
 
-    private void ArenaSuccess()
+
+    public override void ArenaSuccess()
     {
-        var players = Room.GetPlayers();
-        Trigger(players.FirstOrDefault(), true, false);
-        foreach (var player in players)
-            player.TempData.CurrentArena = null;
+        base.ArenaSuccess();
 
         foreach (var spawner in _spawners)
         {
             spawner.Despawn();
             spawner.Destroy();
         }
-        _cleared = true;
     }
 
-    private void ArenaFailure()
+    public override void ArenaFailure()
     {
-        var players = Room.GetPlayers();
-        Trigger(players.FirstOrDefault(), false, false);
-        foreach (var player in players)
-            player.TempData.CurrentArena = null;
+        base.ArenaFailure();
 
         foreach (var spawner in _spawners)
         {

@@ -26,7 +26,7 @@ public class CrashGuard(NetStateHandler handler, ILogger<CrashGuard> logger, Eve
         world.Save(false);
         Backup();
 
-        if (rwConfig.RestartOnCrash)
+        if (rwConfig.RestartOnCrash && !GetOsType.IsUnix())
             Restart(e);
     }
 
@@ -59,31 +59,13 @@ public class CrashGuard(NetStateHandler handler, ILogger<CrashGuard> logger, Eve
 
             InternalDirectory.CreateDirectory(backup);
 
-            CopyFiles(config.SaveDirectory, backup);
+            AutoSave.CopyFiles(config.SaveDirectory, backup, logger);
 
             logger.LogInformation("Backed up!");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unable to back up server.");
-        }
-    }
-
-    private void CopyFiles(string originPath, string backupPath)
-    {
-        try
-        {
-            foreach (var fileLink in Directory.GetFiles(originPath))
-            {
-                var file = Path.GetFileName(fileLink);
-                var oldF = Path.Combine(originPath, file);
-                var newF = Path.Combine(backupPath, file);
-                File.Copy(oldF, newF, true);
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Unable to copy file.");
         }
     }
 

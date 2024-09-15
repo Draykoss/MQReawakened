@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Server.Base.Core.Configs;
+using Server.Base.Core.Extensions;
 using Server.Base.Core.Services;
 using Server.Base.Database.Accounts;
-using Server.Reawakened.Core.Services;
 using Server.Reawakened.Database.Users;
 using Server.Reawakened.Network.Services;
 using Web.Launcher.Extensions;
@@ -13,13 +14,12 @@ namespace Web.Launcher.Controllers.API.JSON.DLC;
 [Route("api/json/dlc/authenticate")]
 public class AuthenticateController(AccountHandler accHandler, UserInfoHandler userInfoHandler,
     TemporaryDataStorage temporaryDataStorage, RandomKeyGenerator keyGenerator,
-    GetServerAddress getSA, LauncherRwConfig config, LauncherRConfig rConfig) : Controller
+    InternalRwConfig iWConfig, LauncherRwConfig config, LauncherRConfig rConfig) : Controller
 {
     [HttpPost]
     public IActionResult GetLoginInfo([FromForm] string username, [FromForm] string token)
     {
-        username = username?.Trim();
-        token = token?.Trim();
+        username = username.Sanitize();
 
         var account = accHandler.GetAccountFromUsername(username);
 
@@ -36,10 +36,9 @@ public class AuthenticateController(AccountHandler accHandler, UserInfoHandler u
 
         var sId = keyGenerator.GetRandomKey<TemporaryDataStorage>(account.Id.ToString());
 
-        temporaryDataStorage.AddData(sId, userInfo.Write);
         temporaryDataStorage.AddData(sId, account.Write);
 
-        var loginData = account.GetLoginData(userInfo, getSA, config, rConfig);
+        var loginData = account.GetLoginData(userInfo, iWConfig, config, rConfig);
 
         return Ok(JsonConvert.SerializeObject(loginData));
     }

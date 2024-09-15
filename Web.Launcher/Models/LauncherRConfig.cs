@@ -1,4 +1,5 @@
 ﻿using Server.Base.Core.Abstractions;
+using Server.Base.Core.Extensions;
 using Server.Reawakened.Core.Enums;
 
 namespace Web.Launcher.Models;
@@ -11,8 +12,6 @@ public class LauncherRConfig : IRConfig
     public bool AnalyticsEnabled { get; }
 
     public string HeaderFolderFilter { get; }
-
-    public string ProjectName { get; }
 
     public bool CrashOnError { get; }
     public bool LogAssets { get; }
@@ -30,6 +29,9 @@ public class LauncherRConfig : IRConfig
     public bool Fullscreen { get; }
     public bool OnGameClosePopup { get; }
 
+    public string GameFolder { get; }
+    public string LauncherFolder { get; }
+
     public LauncherRConfig()
     {
         News = $"You expected there to be news here? It's {DateTime.Now.Year}!";
@@ -43,7 +45,6 @@ public class LauncherRConfig : IRConfig
         CacheLicense = "UNKNOWN";
 
         OverwriteGameConfig = true;
-        ProjectName = "MQReawakened";
         HeaderFolderFilter = "_data";
 
         CacheVersion = 1;
@@ -66,5 +67,8 @@ public class LauncherRConfig : IRConfig
 
         Fullscreen = false;
         OnGameClosePopup = false;
+
+        GameFolder = InternalDirectory.GetDirectory("Game");
+        LauncherFolder = InternalDirectory.GetDirectory("Launcher");
     }
 }

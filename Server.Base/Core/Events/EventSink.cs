@@ -21,6 +21,8 @@ public class EventSink : IEventSink
 
     public delegate void ChangedOperationalModeEventHandler();
 
+    public delegate void ServerHostedHandler();
+
     public delegate void ShutdownEventHandler();
 
     public delegate void SocketConnectEventHandler(SocketConnectEventArgs @event);
@@ -34,17 +36,19 @@ public class EventSink : IEventSink
     public event CrashedEventHandler Crashed;
 
     public event ChangedOperationalModeEventHandler ChangedOperationalMode;
+    public event ServerHostedHandler ServerHosted;
 
     public event ShutdownEventHandler Shutdown;
     public event InternalShutdownEventHandler InternalShutdown;
 
-    public event ServerStartedEventHandler ServerStarted;
     public event SocketConnectEventHandler SocketConnect;
+    public event ServerStartedEventHandler ServerStarted;
 
     public event CreateDataEventHandler CreateData;
 
     public event WorldLoadEventHandler WorldLoad;
     public event WorldBroadcastEventHandler WorldBroadcast;
+    public event WorldSaveEventHandler WorldSave;
 
     public event NetStateRemovedHandler NetStateRemoved;
     public event NetStateAddedHandler NetStateAdded;
@@ -53,6 +57,9 @@ public class EventSink : IEventSink
 
     public void InvokeChangedOperationalMode() =>
         ChangedOperationalMode?.Invoke();
+
+    public void InvokeServerHosted() =>
+        ServerHosted?.Invoke();
 
     public void InvokeShutdown() => Shutdown?.Invoke();
     public void InvokeInternalShutdown() => InternalShutdown?.Invoke();
@@ -64,6 +71,7 @@ public class EventSink : IEventSink
 
     public void InvokeWorldLoad() => WorldLoad?.Invoke();
     public void InvokeWorldBroadcast(WorldBroadcastEventArgs e) => WorldBroadcast?.Invoke(e);
+    public void InvokeWorldSave(WorldSaveEventArgs e) => WorldSave?.Invoke(e);
 
     public void InvokeNetStateRemoved(NetStateRemovedEventArgs e) => NetStateRemoved?.Invoke(e);
     public void InvokeNetStateAdded(NetStateAddedEventArgs e) => NetStateAdded?.Invoke(e);

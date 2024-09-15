@@ -5,7 +5,9 @@ using Server.Base.Accounts.Enums;
 using Server.Base.Accounts.Extensions;
 using Server.Base.Accounts.Helpers;
 using Server.Base.Core.Configs;
+using Server.Base.Core.Extensions;
 using Server.Base.Core.Services;
+using Server.Base.Database.Abstractions;
 using Server.Base.Logging;
 using Server.Base.Network;
 using Server.Base.Network.Helpers;
@@ -22,21 +24,24 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
     public override AccountDbEntry CreateDefault()
     {
         Logger.LogInformation("Username: ");
-        var username = Console.ReadLine();
+        var username = ConsoleExt.ReadOrEnv("DEFAULT_USERNAME", Logger);
 
         Logger.LogInformation("Password: ");
-        var password = Console.ReadLine();
+        var password = ConsoleExt.ReadOrEnv("DEFAULT_PASSWORD", Logger);
 
         Logger.LogInformation("Email: ");
-        var email = Console.ReadLine();
+        var email = ConsoleExt.ReadOrEnv("DEFAULT_EMAIL", Logger);
 
-        if (username != null)
+        username = username.Sanitize();
+        email = email.Sanitize();
+
+        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(email))
             return new AccountDbEntry(username, password, email, hasher)
             {
                 AccessLevel = AccessLevel.Owner
             };
 
-        Logger.LogError("Username for account is null!");
+        Logger.LogError("Username or email for account is null!");
         return null;
     }
 
@@ -46,13 +51,33 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
     public AccountModel GetAccountFromUsername(string username) =>
         GetAccountFromId(GetIdFromUserName(username));
 
+    public AccountModel GetAccountFromEmail(string email) =>
+        GetAccountFromId(GetIdFromEmail(email));
+
     public static AccountModel GetAccountFromModel(AccountDbEntry model) =>
         model != null ? new(model) : null;
+
+    protected int GetIdFromEmail(string email)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BaseDatabase>();
+
+        email = email.Sanitize();
+
+        lock (DbLock.Lock)
+        {
+            var account = db.Accounts.AsNoTracking().FirstOrDefault(a => a.Email == email);
+
+            return account == null ? -1 : account.Id;
+        }
+    }
 
     protected int GetIdFromUserName(string username)
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BaseDatabase>();
+
+        username = username.Sanitize();
 
         lock (DbLock.Lock)
         {
@@ -64,6 +89,8 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
 
     public AlrReason GetAccount(string username, string password, NetState netState)
     {
+        username = username.Sanitize();
+
         var rejectReason = AlrReason.Invalid;
 
         if (!config.SocketBlock && !ipLimiter.Verify(netState.Address))
@@ -77,7 +104,11 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
 
             if (username == ".")
             {
-                account = new AccountModel(temporaryDataStorage.GetData<AccountDbEntry>(password));
+                var entry = temporaryDataStorage.GetData<AccountDbEntry>(password);
+
+                account = new AccountModel(entry);
+
+                temporaryDataStorage.RemoveData(password, entry);
 
                 if (account == null)
                     rejectReason = AlrReason.BadComm;
@@ -129,7 +160,10 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
 
     public AccountModel Create(IPAddress ipAddress, string username, string password, string email)
     {
-        if (username.Trim().Length <= 0 || password.Trim().Length <= 0 || email.Trim().Length <= 0)
+        username = username.Sanitize();
+        email = email.Sanitize();
+
+        if (username.Length <= 0 || password.Length <= 0 || email.Length <= 0)
         {
             Logger.LogInformation("Login: {Address}: User post _data for '{Username}' is invalid in length!",
                 ipAddress, username);
@@ -170,6 +204,8 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BaseDatabase>();
 
+        username = username.Sanitize();
+
         lock (DbLock.Lock)
         {
             return db.Accounts.Any(a => a.Username == username);
@@ -180,6 +216,8 @@ public class AccountHandler(PasswordHasher hasher, AccountAttackLimiter attackLi
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BaseDatabase>();
+
+        email = email.Sanitize();
 
         lock (DbLock.Lock)
         {
